@@ -8,6 +8,8 @@ struct HeatmapGrid: View {
     let today: Date
     let columns: Int
     let cellGap: CGFloat
+    var containerCornerRadius: CGFloat = 0
+    var gridPadding: CGFloat = 0
     @Environment(\.widgetRenderingMode) private var widgetRenderingMode
 
     private let rows = 7
@@ -18,7 +20,9 @@ struct HeatmapGrid: View {
                 size: proxy.size,
                 columns: columns,
                 rows: rows,
-                gap: cellGap
+                gap: cellGap,
+                containerCornerRadius: containerCornerRadius,
+                gridPadding: gridPadding
             )
 
             if widgetRenderingMode == .fullColor {
@@ -106,6 +110,11 @@ struct HeatmapGrid: View {
         filter: (HeatmapCell?) -> Bool,
         color: (HeatmapCell?) -> Color
     ) {
+        let lastCol = columns - 1
+        let lastRow = rows - 1
+        let cr = layout.cornerRadius
+        let outerCR = layout.outerCornerRadius
+
         for column in 0..<columns {
             for row in 0..<rows {
                 let index = column * rows + row
@@ -117,7 +126,24 @@ struct HeatmapGrid: View {
                 let x = layout.origin.x + CGFloat(column) * (layout.cellSize + cellGap)
                 let y = layout.origin.y + CGFloat(row) * (layout.cellSize + cellGap)
                 let rect = CGRect(x: x, y: y, width: layout.cellSize, height: layout.cellSize)
-                let path = Path(roundedRect: rect, cornerRadius: layout.cornerRadius)
+
+                let path: Path
+                if outerCR > cr {
+                    if column == 0 && row == 0 {
+                        path = Path(roundedRect: rect, cornerRadii: .init(topLeading: outerCR, bottomLeading: cr, bottomTrailing: cr, topTrailing: cr), style: .continuous)
+                    } else if column == lastCol && row == 0 {
+                        path = Path(roundedRect: rect, cornerRadii: .init(topLeading: cr, bottomLeading: cr, bottomTrailing: cr, topTrailing: outerCR), style: .continuous)
+                    } else if column == 0 && row == lastRow {
+                        path = Path(roundedRect: rect, cornerRadii: .init(topLeading: cr, bottomLeading: outerCR, bottomTrailing: cr, topTrailing: cr), style: .continuous)
+                    } else if column == lastCol && row == lastRow {
+                        path = Path(roundedRect: rect, cornerRadii: .init(topLeading: cr, bottomLeading: cr, bottomTrailing: outerCR, topTrailing: cr), style: .continuous)
+                    } else {
+                        path = Path(roundedRect: rect, cornerRadius: cr)
+                    }
+                } else {
+                    path = Path(roundedRect: rect, cornerRadius: cr)
+                }
+
                 context.fill(path, with: .color(color(cell)))
             }
         }
@@ -126,9 +152,10 @@ struct HeatmapGrid: View {
     private struct GridLayout {
         let cellSize: CGFloat
         let cornerRadius: CGFloat
+        let outerCornerRadius: CGFloat
         let origin: CGPoint
 
-        init(size: CGSize, columns: Int, rows: Int, gap: CGFloat) {
+        init(size: CGSize, columns: Int, rows: Int, gap: CGFloat, containerCornerRadius: CGFloat = 0, gridPadding: CGFloat = 0) {
             // Calculate the largest square cell that fits in both dimensions
             let maxCellWidth = (size.width - CGFloat(max(columns - 1, 0)) * gap) / CGFloat(columns)
             let maxCellHeight = (size.height - CGFloat(max(rows - 1, 0)) * gap) / CGFloat(rows)
@@ -139,6 +166,7 @@ struct HeatmapGrid: View {
 
             self.cellSize = cellSize
             self.cornerRadius = min(max(cellSize * 0.15, 2), 4)
+            self.outerCornerRadius = max(containerCornerRadius - gridPadding - (gap / 2), self.cornerRadius)
             self.origin = CGPoint(
                 x: (size.width - usedWidth) / 2,
                 y: (size.height - usedHeight) / 2
@@ -148,11 +176,11 @@ struct HeatmapGrid: View {
 }
 
 enum HeatmapWidgetStyle {
-    static let backgroundColor = Color(red: 0.05, green: 0.06, blue: 0.08)
+    static let backgroundColor = Color(red: 0.02, green: 0.03, blue: 0.05)
     static let legacyBackgroundGradient = LinearGradient(
         colors: [
             Color(red: 0.10, green: 0.11, blue: 0.14),
-            Color(red: 0.04, green: 0.05, blue: 0.07)
+            Color(red: 0.06, green: 0.07, blue: 0.09)
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing

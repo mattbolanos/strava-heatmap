@@ -16,6 +16,7 @@ struct HeatmapWidgetView: View {
                     Color.clear
                 }
             }
+            .clipShape(.rect(cornerRadius: containerCornerRadius, style: .continuous))
     }
 
     @ViewBuilder
@@ -27,6 +28,17 @@ struct HeatmapWidgetView: View {
             MediumHeatmapView(entry: entry)
         default:
             SmallHeatmapView(entry: entry)
+        }
+    }
+
+    private var containerCornerRadius: CGFloat {
+        switch family {
+        case .systemSmall:
+            return 28
+        case .systemMedium:
+            return 24
+        default:
+            return 24
         }
     }
 }

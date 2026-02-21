@@ -15,12 +15,19 @@ struct MediumHeatmapView: View {
             maxMiles: entry.viewModel.maxMiles,
             today: entry.viewModel.today,
             columns: columns,
-            cellGap: tileGap
+            cellGap: tileGap,
+            containerCornerRadius: 24,
+            gridPadding: gridPadding
         )
+        .padding(gridPadding)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var tileGap: CGFloat {
-        widgetRenderingMode == .fullColor ? 4 : 3
+        widgetRenderingMode == .fullColor ? 5 : 4
+    }
+
+    private var gridPadding: CGFloat {
+        widgetRenderingMode == .fullColor ? 8 : 7
     }
 }
