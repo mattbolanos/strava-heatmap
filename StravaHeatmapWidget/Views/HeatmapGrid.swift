@@ -179,8 +179,8 @@ enum HeatmapWidgetStyle {
     static let backgroundColor = Color(red: 0.02, green: 0.03, blue: 0.05)
     static let legacyBackgroundGradient = LinearGradient(
         colors: [
-            Color(red: 0.10, green: 0.11, blue: 0.14),
-            Color(red: 0.06, green: 0.07, blue: 0.09)
+            Color(red: 0.02, green: 0.02, blue: 0.03),
+            Color(red: 0.01, green: 0.01, blue: 0.02)
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
