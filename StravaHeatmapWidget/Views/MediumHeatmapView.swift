@@ -1,18 +1,26 @@
 import SwiftUI
 import StravaHeatmapCore
+import WidgetKit
 
 struct MediumHeatmapView: View {
     let entry: HeatmapEntry
 
+    @Environment(\.widgetRenderingMode) private var widgetRenderingMode
+
+    private let columns = 16
+
     var body: some View {
         HeatmapGrid(
-            cells: HeatmapWidgetData.recentCells(from: entry.viewModel, count: 36),
+            cells: HeatmapWidgetData.recentCells(from: entry.viewModel, count: columns * 7),
             maxMiles: entry.viewModel.maxMiles,
             today: entry.viewModel.today,
-            columns: 9,
-            rows: 4
+            columns: columns,
+            cellGap: tileGap
         )
-        .padding(10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var tileGap: CGFloat {
+        widgetRenderingMode == .fullColor ? 4 : 3
     }
 }

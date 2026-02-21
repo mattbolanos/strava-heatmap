@@ -11,14 +11,10 @@ struct StravaHeatmapWidget: Widget {
             provider: HeatmapTimelineProvider()
         ) { entry in
             HeatmapWidgetView(entry: entry)
-                .containerBackground(for: .widget) {
-                    HeatmapWidgetStyle.backgroundColor
-                }
         }
         .configurationDisplayName("Strava Heatmap")
         .description("GitHub-style contribution heatmap for your selected Strava activity types.")
         .supportedFamilies([.systemSmall, .systemMedium])
         .contentMarginsDisabled()
-        .containerBackgroundRemovable(false)
     }
 }

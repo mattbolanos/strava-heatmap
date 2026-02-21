@@ -6,66 +6,53 @@ struct HeatmapGrid: View {
     let cells: [HeatmapCell?]
     let maxMiles: Double
     let today: Date
+    let columns: Int
+    let cellGap: CGFloat
     @Environment(\.widgetRenderingMode) private var widgetRenderingMode
+
+    private let rows = 7
 
     var body: some View {
         GeometryReader { proxy in
-            let layout = GridLayout(size: proxy.size, columns: columns, rows: rows)
+            let layout = GridLayout(
+                size: proxy.size,
+                columns: columns,
+                rows: rows,
+                gap: cellGap
+            )
 
-            Canvas { context, _ in
-                let clippingRect = CGRect(
-                    x: layout.origin.x,
-                    y: layout.origin.y,
-                    width: layout.usedWidth,
-                    height: layout.usedHeight
-                )
-                let clippingPath = Path(
-                    roundedRect: clippingRect,
-                    cornerRadius: layout.outerCornerRadius,
-                    style: .continuous
-                )
-                context.clip(to: clippingPath)
-
-                for row in 0..<rows {
-                    for column in 0..<columns {
-                        let index = row * columns + column
-                        guard index < cells.count else { continue }
-
-                        let mirroredColumn = columns - 1 - column
-                        let x = layout.origin.x + CGFloat(mirroredColumn) * (layout.tileSize + layout.gap)
-                        let y = layout.origin.y + CGFloat(row) * (layout.tileSize + layout.gap)
-                        let rect = CGRect(x: x, y: y, width: layout.tileSize, height: layout.tileSize)
-                        let path = Path(roundedRect: rect, cornerRadius: layout.cornerRadius)
-                        context.fill(path, with: .color(color(for: cells[index])))
+            if widgetRenderingMode == .fullColor {
+                Canvas { context, _ in
+                    drawCells(
+                        in: context,
+                        layout: layout,
+                        filter: { _ in true },
+                        color: fullColor(for:)
+                    )
+                }
+            } else {
+                ZStack {
+                    Canvas { context, _ in
+                        drawCells(
+                            in: context,
+                            layout: layout,
+                            filter: isPrimaryAccentedCell(_:),
+                            color: primaryAccentedColor(for:)
+                        )
                     }
+
+                    Canvas { context, _ in
+                        drawCells(
+                            in: context,
+                            layout: layout,
+                            filter: isAccentCell(_:),
+                            color: accentColor(for:)
+                        )
+                    }
+                    .widgetAccentable()
                 }
             }
         }
-    }
-
-    private let columns: Int
-    private let rows: Int
-
-    init(
-        cells: [HeatmapCell?],
-        maxMiles: Double,
-        today: Date,
-        columns: Int,
-        rows: Int
-    ) {
-        self.cells = cells
-        self.maxMiles = maxMiles
-        self.today = today
-        self.columns = max(columns, 1)
-        self.rows = max(rows, 1)
-    }
-
-    private func color(for cell: HeatmapCell?) -> Color {
-        if widgetRenderingMode == .fullColor {
-            return fullColor(for: cell)
-        }
-
-        return monochromeColor(for: cell)
     }
 
     private func fullColor(for cell: HeatmapCell?) -> Color {
@@ -81,7 +68,7 @@ struct HeatmapGrid: View {
         return HeatmapColors.tileColor(level: level, colorScheme: .dark)
     }
 
-    private func monochromeColor(for cell: HeatmapCell?) -> Color {
+    private func primaryAccentedColor(for cell: HeatmapCell?) -> Color {
         guard let cell else {
             return HeatmapWidgetStyle.vibrantEmptyTileColor
         }
@@ -90,36 +77,68 @@ struct HeatmapGrid: View {
             return HeatmapWidgetStyle.vibrantFutureTileColor
         }
 
-        let level = min(max(HeatmapBuilder.getLevel(miles: cell.miles, maxMiles: maxMiles), 0), 4)
+        return HeatmapWidgetStyle.vibrantEmptyTileColor
+    }
+
+    private func accentColor(for cell: HeatmapCell?) -> Color {
+        guard let cell, cell.date <= today, cell.miles > 0 else {
+            return .clear
+        }
+
+        let level = min(max(HeatmapBuilder.getLevel(miles: cell.miles, maxMiles: maxMiles), 1), 4)
         return HeatmapWidgetStyle.vibrantTileOpacityByLevel[level]
     }
 
+    private func isAccentCell(_ cell: HeatmapCell?) -> Bool {
+        guard let cell else {
+            return false
+        }
+        return cell.date <= today && cell.miles > 0
+    }
+
+    private func isPrimaryAccentedCell(_ cell: HeatmapCell?) -> Bool {
+        !isAccentCell(cell)
+    }
+
+    private func drawCells(
+        in context: GraphicsContext,
+        layout: GridLayout,
+        filter: (HeatmapCell?) -> Bool,
+        color: (HeatmapCell?) -> Color
+    ) {
+        for column in 0..<columns {
+            for row in 0..<rows {
+                let index = column * rows + row
+                guard index < cells.count else { continue }
+
+                let cell = cells[index]
+                guard filter(cell) else { continue }
+
+                let x = layout.origin.x + CGFloat(column) * (layout.cellSize + cellGap)
+                let y = layout.origin.y + CGFloat(row) * (layout.cellSize + cellGap)
+                let rect = CGRect(x: x, y: y, width: layout.cellSize, height: layout.cellSize)
+                let path = Path(roundedRect: rect, cornerRadius: layout.cornerRadius)
+                context.fill(path, with: .color(color(cell)))
+            }
+        }
+    }
+
     private struct GridLayout {
-        let tileSize: CGFloat
-        let gap: CGFloat
+        let cellSize: CGFloat
         let cornerRadius: CGFloat
-        let outerCornerRadius: CGFloat
-        let usedWidth: CGFloat
-        let usedHeight: CGFloat
         let origin: CGPoint
 
-        init(size: CGSize, columns: Int, rows: Int) {
-            let shortSide = min(size.width, size.height)
-            let gap = min(max(shortSide * 0.02, 1.5), 4)
+        init(size: CGSize, columns: Int, rows: Int, gap: CGFloat) {
+            // Calculate the largest square cell that fits in both dimensions
+            let maxCellWidth = (size.width - CGFloat(max(columns - 1, 0)) * gap) / CGFloat(columns)
+            let maxCellHeight = (size.height - CGFloat(max(rows - 1, 0)) * gap) / CGFloat(rows)
+            let cellSize = floor(min(maxCellWidth, maxCellHeight))
 
-            let tileWidth = (size.width - CGFloat(max(columns - 1, 0)) * gap) / CGFloat(max(columns, 1))
-            let tileHeight = (size.height - CGFloat(max(rows - 1, 0)) * gap) / CGFloat(max(rows, 1))
-            let tileSize = max(1, floor(min(tileWidth, tileHeight)))
+            let usedWidth = cellSize * CGFloat(columns) + CGFloat(max(columns - 1, 0)) * gap
+            let usedHeight = cellSize * CGFloat(rows) + CGFloat(max(rows - 1, 0)) * gap
 
-            let usedWidth = tileSize * CGFloat(columns) + CGFloat(max(columns - 1, 0)) * gap
-            let usedHeight = tileSize * CGFloat(rows) + CGFloat(max(rows - 1, 0)) * gap
-
-            self.tileSize = tileSize
-            self.gap = gap
-            self.cornerRadius = min(max(tileSize * 0.24, 3), 8)
-            self.outerCornerRadius = min(max(tileSize * 0.55, 8), 16)
-            self.usedWidth = usedWidth
-            self.usedHeight = usedHeight
+            self.cellSize = cellSize
+            self.cornerRadius = min(max(cellSize * 0.15, 2), 4)
             self.origin = CGPoint(
                 x: (size.width - usedWidth) / 2,
                 y: (size.height - usedHeight) / 2
@@ -129,7 +148,15 @@ struct HeatmapGrid: View {
 }
 
 enum HeatmapWidgetStyle {
-    static let backgroundColor = Color(red: 0.04, green: 0.05, blue: 0.07)
+    static let backgroundColor = Color(red: 0.05, green: 0.06, blue: 0.08)
+    static let legacyBackgroundGradient = LinearGradient(
+        colors: [
+            Color(red: 0.10, green: 0.11, blue: 0.14),
+            Color(red: 0.04, green: 0.05, blue: 0.07)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
     static let emptyTileColor = HeatmapColors.tileColor(level: 0, colorScheme: .dark)
     static let vibrantEmptyTileColor = Color.primary.opacity(0.22)
     static let vibrantFutureTileColor = Color.primary.opacity(0.16)

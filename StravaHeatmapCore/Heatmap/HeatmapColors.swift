@@ -1,7 +1,7 @@
 import SwiftUI
 
 public enum HeatmapColors {
-    public static let colorMixByLevel = [0.0, 0.30, 0.50, 0.75, 1.0]
+    public static let colorMixByLevel = [0.0, 0.50, 0.70, 0.85, 1.0]
 
     public static func tileColor(level: Int, colorScheme: ColorScheme) -> Color {
         let clamped = min(max(level, 0), 4)
