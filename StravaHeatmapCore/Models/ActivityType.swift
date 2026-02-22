@@ -1,5 +1,4 @@
 import Foundation
-import AppIntents
 
 public enum ActivityType: String, CaseIterable, Codable, Hashable, Sendable {
     case run = "Run"
@@ -62,22 +61,3 @@ public enum ActivityType: String, CaseIterable, Codable, Hashable, Sendable {
     }
 }
 
-extension ActivityType: AppEnum {
-    public static var typeDisplayRepresentation: TypeDisplayRepresentation {
-        TypeDisplayRepresentation(name: "Activity Type")
-    }
-
-    public static var caseDisplayRepresentations: [ActivityType: DisplayRepresentation] {
-        [
-            .run: DisplayRepresentation(title: "Run"),
-            .ride: DisplayRepresentation(title: "Ride"),
-            .swim: DisplayRepresentation(title: "Swim"),
-            .walk: DisplayRepresentation(title: "Walk"),
-            .hike: DisplayRepresentation(title: "Hike"),
-            .virtualRide: DisplayRepresentation(title: "Virtual Ride"),
-            .virtualRun: DisplayRepresentation(title: "Virtual Run"),
-            .weightTraining: DisplayRepresentation(title: "Weight Training"),
-            .yoga: DisplayRepresentation(title: "Yoga"),
-        ]
-    }
-}

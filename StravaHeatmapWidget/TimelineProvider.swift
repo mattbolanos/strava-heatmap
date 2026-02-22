@@ -70,7 +70,7 @@ struct HeatmapTimelineProvider: AppIntentTimelineProvider {
     }
 
     private func resolvedTypes(from configuration: SelectActivityTypesIntent) -> Set<ActivityType> {
-        let fromIntent = Set(configuration.activityTypes)
+        let fromIntent = Set(configuration.activityTypes.toCoreTypes)
         if !fromIntent.isEmpty {
             return fromIntent
         }

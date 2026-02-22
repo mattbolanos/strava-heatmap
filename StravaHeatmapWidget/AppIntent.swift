@@ -6,5 +6,5 @@ struct SelectActivityTypesIntent: WidgetConfigurationIntent {
     static var description = IntentDescription("Choose which Strava activity types are shown in the heatmap.")
 
     @Parameter(title: "Types", default: [.run])
-    var activityTypes: [ActivityType]
+    var activityTypes: [WidgetActivityType]
 }
