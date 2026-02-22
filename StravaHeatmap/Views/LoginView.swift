@@ -9,26 +9,39 @@ struct LoginView: View {
     private let oauth = OAuthSessionCoordinator()
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Strava Heatmap")
-                .font(.title.bold())
+        VStack(spacing: 0) {
+            Spacer()
 
-            Text("Connect your Strava account to enable the widget.")
+            HeatmapPreview()
+                .frame(maxWidth: 220)
+                .padding(.bottom, 32)
+
+            Text("Stratiles")
+                .font(.largeTitle.bold())
+                .padding(.bottom, 8)
+
+            Text("Your Strava activity heatmap,\nright on your Home Screen.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
+                .padding(.bottom, 32)
 
             Button {
                 Task { await connectWithStrava() }
             } label: {
                 if isLoading {
                     ProgressView()
+                        .tint(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 22)
                 } else {
                     Text("Connect with Strava")
                         .bold()
                         .frame(maxWidth: .infinity)
                 }
             }
-            .buttonStyle(.borderedProminent)
+            .padding(.vertical, 14)
+            .foregroundStyle(.white)
+            .background(Theme.stravaOrange, in: RoundedRectangle(cornerRadius: 12))
             .disabled(isLoading)
 
             if let errorMessage {
@@ -36,7 +49,10 @@ struct LoginView: View {
                     .font(.footnote)
                     .foregroundStyle(.red)
                     .multilineTextAlignment(.center)
+                    .padding(.top, 12)
             }
+
+   
         }
         .padding(24)
     }

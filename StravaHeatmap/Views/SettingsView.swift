@@ -16,6 +16,19 @@ struct SettingsView: View {
                         Toggle(type.displayName, isOn: binding(for: type))
                     }
                 }
+                .tint(Theme.stravaOrange)
+
+                Section {
+                    WidgetInstructionRow(step: 1, icon: "plus.app", text: "Long-press your Home Screen")
+                    WidgetInstructionRow(step: 2, icon: "magnifyingglass", text: "Search for \"Stratiles\"")
+                    WidgetInstructionRow(step: 3, icon: "hand.tap", text: "Tap Add Widget")
+                    WidgetInstructionRow(step: 4, icon: "arrow.up.left.and.arrow.down.right", text: "Choose small or medium size")
+                    WidgetInstructionRow(step: 5, icon: "checkmark.circle", text: "Tap Done to confirm")
+                } header: {
+                    Text("Add to Home Screen")
+                } footer: {
+                    Text("Tip: Long-press the widget and choose \"Edit Widget\" to change activity types directly.")
+                }
 
                 Section {
                     Button(role: .destructive) {
@@ -28,9 +41,11 @@ struct SettingsView: View {
                         }
                     }
                     .disabled(isSigningOut)
+                } header: {
+                    Text("Account")
                 }
             }
-            .navigationTitle("Strava Heatmap")
+            .navigationTitle("Stratiles")
         }
         .onChange(of: selectedTypes) { _, newValue in
             let nonEmpty = newValue.isEmpty ? Set([ActivityType.run]) : newValue
@@ -62,5 +77,28 @@ struct SettingsView: View {
             isSigningOut = false
             onSignedOut()
         }
+    }
+}
+
+private struct WidgetInstructionRow: View {
+    let step: Int
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Theme.stravaOrange.opacity(0.15))
+                    .frame(width: 36, height: 36)
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Theme.stravaOrange)
+            }
+
+            Text("\(step). \(text)")
+                .font(.subheadline)
+        }
+        .padding(.vertical, 2)
     }
 }

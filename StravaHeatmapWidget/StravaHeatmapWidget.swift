@@ -12,7 +12,7 @@ struct StravaHeatmapWidget: Widget {
         ) { entry in
             HeatmapWidgetView(entry: entry)
         }
-        .configurationDisplayName("Strava Heatmap")
+        .configurationDisplayName("Stratiles")
         .description("GitHub-style contribution heatmap for your selected Strava activity types.")
         .supportedFamilies([.systemSmall, .systemMedium])
         .contentMarginsDisabled()
