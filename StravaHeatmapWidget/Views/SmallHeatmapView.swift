@@ -11,7 +11,7 @@ struct SmallHeatmapView: View {
 
     var body: some View {
         HeatmapGrid(
-            cells: HeatmapWidgetData.recentCells(from: entry.viewModel, count: columns * 7),
+            cells: HeatmapWidgetData.recentCells(from: entry.viewModel, columns: columns),
             maxMiles: entry.viewModel.maxMiles,
             today: entry.viewModel.today,
             columns: columns,

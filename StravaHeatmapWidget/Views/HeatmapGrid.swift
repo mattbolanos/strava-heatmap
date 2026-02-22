@@ -121,6 +121,7 @@ struct HeatmapGrid: View {
                 guard index < cells.count else { continue }
 
                 let cell = cells[index]
+                guard cell != nil else { continue }
                 guard filter(cell) else { continue }
 
                 let x = layout.origin.x + CGFloat(column) * (layout.cellSize + cellGap)
@@ -198,18 +199,31 @@ enum HeatmapWidgetStyle {
 }
 
 enum HeatmapWidgetData {
-    static func recentCells(from viewModel: HeatmapViewModel, count: Int) -> [HeatmapCell?] {
-        guard count > 0 else {
-            return []
+    static func recentCells(from viewModel: HeatmapViewModel, columns: Int) -> [HeatmapCell?] {
+        guard columns > 0 else { return [] }
+
+        // Take the last N weeks, preserving week structure (each week = Sun..Sat)
+        let recentWeeks = viewModel.weeks.suffix(columns)
+        let paddingCount = max(0, columns - recentWeeks.count)
+
+        var cells: [HeatmapCell?] = []
+
+        // Pad with nils for missing weeks at the start
+        for _ in 0..<(paddingCount * 7) {
+            cells.append(nil)
         }
 
-        let completedDays = viewModel.weeks
-            .flatMap(\.values)
-            .filter { $0.date <= viewModel.today }
-            .sorted { $0.date < $1.date }
+        // Append each week's 7 days, nilling out future dates
+        for week in recentWeeks {
+            for cell in week.values {
+                if cell.date > viewModel.today {
+                    cells.append(nil)
+                } else {
+                    cells.append(cell)
+                }
+            }
+        }
 
-        let visible = Array(completedDays.suffix(count))
-        let missing = max(0, count - visible.count)
-        return Array(repeating: nil, count: missing) + visible.map(Optional.some)
+        return cells
     }
 }

@@ -1,7 +1,5 @@
 import Foundation
-#if canImport(AppIntents)
 import AppIntents
-#endif
 
 public enum ActivityType: String, CaseIterable, Codable, Hashable, Sendable {
     case run = "Run"
@@ -64,7 +62,6 @@ public enum ActivityType: String, CaseIterable, Codable, Hashable, Sendable {
     }
 }
 
-#if canImport(AppIntents)
 extension ActivityType: AppEnum {
     public static var typeDisplayRepresentation: TypeDisplayRepresentation {
         TypeDisplayRepresentation(name: "Activity Type")
@@ -84,4 +81,3 @@ extension ActivityType: AppEnum {
         ]
     }
 }
-#endif
