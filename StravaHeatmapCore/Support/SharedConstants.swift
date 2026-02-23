@@ -16,7 +16,7 @@ public enum SharedActivityTypeSettings {
         let defaults = SharedConstants.sharedDefaults
         let raw = defaults?.stringArray(forKey: SharedConstants.selectedActivityTypesDefaultsKey) ?? []
         let parsed = Set(raw.compactMap(ActivityType.init(rawValue:)))
-        return parsed.isEmpty ? [.run] : parsed
+        return parsed.isEmpty ? ActivityType.defaultSelected : parsed
     }
 
     public static func saveSelectedTypes(_ types: Set<ActivityType>) {

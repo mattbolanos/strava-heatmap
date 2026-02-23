@@ -47,7 +47,7 @@ struct SettingsView: View {
             .navigationTitle("Stratiles")
         }
         .onChange(of: selectedTypes) { _, newValue in
-            let nonEmpty = newValue.isEmpty ? Set([ActivityType.run]) : newValue
+            let nonEmpty = newValue.isEmpty ? ActivityType.defaultSelected : newValue
             selectedTypes = nonEmpty
             SharedActivityTypeSettings.saveSelectedTypes(nonEmpty)
             WidgetCenter.shared.reloadAllTimelines()
