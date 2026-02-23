@@ -20,10 +20,9 @@ struct SettingsView: View {
 
                 Section {
                     WidgetInstructionRow(step: 1, icon: "plus.app", text: "Long-press your Home Screen")
-                    WidgetInstructionRow(step: 2, icon: "magnifyingglass", text: "Search for \"Stratiles\"")
-                    WidgetInstructionRow(step: 3, icon: "hand.tap", text: "Tap Add Widget")
-                    WidgetInstructionRow(step: 4, icon: "arrow.up.left.and.arrow.down.right", text: "Choose small or medium size")
-                    WidgetInstructionRow(step: 5, icon: "checkmark.circle", text: "Tap Done to confirm")
+                    WidgetInstructionRow(step: 2, icon: "hand.tap", text: "Tap Add Widget")
+                    WidgetInstructionRow(step: 3, icon: "magnifyingglass", text: "Search for \"Stratiles\"")
+                    WidgetInstructionRow(step: 4, icon: "checkmark.circle", text: "Add the widget you want!")
                 } header: {
                     Text("Add to Home Screen")
                 } footer: {
