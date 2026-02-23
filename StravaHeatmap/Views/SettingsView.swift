@@ -11,9 +11,26 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Activity Types") {
-                    ForEach(ActivityType.allCases, id: \.self) { type in
-                        Toggle(type.displayName, isOn: binding(for: type))
+                ForEach(ActivityType.grouped(), id: \.category) { group in
+                    Section {
+                        ForEach(group.types, id: \.self) { type in
+                            Toggle(type.displayName, isOn: binding(for: type))
+                        }
+                    } header: {
+                        if #available(iOS 26.0, *) {
+                            Label(group.category.rawValue, systemImage: group.category.icon)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Theme.stravaOrange)
+                                .textCase(nil)
+                                .labelStyle(.titleAndIcon)
+                                .labelIconToTitleSpacing(8)
+                        } else {
+                            Label(group.category.rawValue, systemImage: group.category.icon)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Theme.stravaOrange)
+                                .textCase(nil)
+                                .labelStyle(.titleAndIcon)
+                        }
                     }
                 }
                 .tint(Theme.stravaOrange)
@@ -24,24 +41,37 @@ struct SettingsView: View {
                     WidgetInstructionRow(step: 3, icon: "magnifyingglass", text: "Search for \"Stratiles\"")
                     WidgetInstructionRow(step: 4, icon: "checkmark.circle", text: "Add the widget you want!")
                 } header: {
-                    Text("Add to Home Screen")
+                    if #available(iOS 26.0, *) {
+                        Label("Add to Home Screen", systemImage: "square.grid.2x2")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.stravaOrange)
+                            .textCase(nil)
+                            .labelStyle(.titleAndIcon)
+                            .labelIconToTitleSpacing(8)
+                    } else {
+                        Label("Add to Home Screen", systemImage: "square.grid.2x2")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.stravaOrange)
+                            .textCase(nil)
+                            .labelStyle(.titleOnly)
+                    }
                 } footer: {
-                    Text("Tip: Long-press the widget and choose \"Edit Widget\" to change activity types directly.")
+                    Text("Long-press the widget and choose \"Edit Widget\" to change activity types directly from there.")
                 }
 
                 Section {
                     Button(role: .destructive) {
                         Task { await signOut() }
                     } label: {
-                        if isSigningOut {
-                            ProgressView()
-                        } else {
-                            Text("Sign Out")
+                        HStack {
+                            if isSigningOut {
+                                ProgressView()
+                            } else {
+                                Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                            }
                         }
                     }
                     .disabled(isSigningOut)
-                } header: {
-                    Text("Account")
                 }
             }
             .navigationTitle("Stratiles")
@@ -88,10 +118,10 @@ private struct WidgetInstructionRow: View {
         HStack(spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(Theme.stravaOrange.opacity(0.15))
-                    .frame(width: 36, height: 36)
+                    .fill(Theme.subtleOrange)
+                    .frame(width: 32, height: 32)
                 Image(systemName: icon)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Theme.stravaOrange)
             }
 

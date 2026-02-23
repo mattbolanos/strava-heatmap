@@ -6,6 +6,7 @@ struct LoginView: View {
 
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var appeared = false
     private let oauth = OAuthSessionCoordinator()
 
     var body: some View {
@@ -13,48 +14,69 @@ struct LoginView: View {
             Spacer()
 
             HeatmapPreview()
-                .frame(maxWidth: 220)
-                .padding(.bottom, 32)
+                .frame(maxWidth: 200)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 12)
+                .padding(.bottom, 40)
 
             Text("Stratiles")
-                .font(.largeTitle.bold())
-                .padding(.bottom, 8)
+                .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 8)
 
             Text("Your Strava activity heatmap,\nright on your Home Screen.")
+                .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
-                .padding(.bottom, 32)
+                .padding(.top, 6)
+                .opacity(appeared ? 1 : 0)
 
-            Button {
-                Task { await connectWithStrava() }
-            } label: {
-                if isLoading {
-                    ProgressView()
-                        .tint(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 22)
-                } else {
-                    Text("Connect with Strava")
-                        .bold()
-                        .frame(maxWidth: .infinity)
+            Spacer()
+
+            VStack(spacing: 16) {
+                Button {
+                    Task { await connectWithStrava() }
+                } label: {
+                    Group {
+                        if isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Label("Connect with Strava", systemImage: "link")
+                                .fontWeight(.semibold)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 24)
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.roundedRectangle(radius: 14))
+                .controlSize(.large)
+                .disabled(isLoading)
+                .opacity(appeared ? 1 : 0)
+
+                if let errorMessage {
+                    Text(errorMessage)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .multilineTextAlignment(.center)
                 }
             }
-            .padding(.vertical, 14)
-            .foregroundStyle(.white)
-            .background(Theme.stravaOrange, in: RoundedRectangle(cornerRadius: 12))
-            .disabled(isLoading)
+            .padding(.bottom, 8)
 
-            if let errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 12)
-            }
-
-   
+            Text("We only read your activity data.\nNothing is stored on our servers.")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 4)
+                .padding(.bottom, 16)
         }
-        .padding(24)
+        .padding(.horizontal, 28)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.6)) {
+                appeared = true
+            }
+        }
     }
 
     private func connectWithStrava() async {

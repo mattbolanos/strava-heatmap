@@ -173,6 +173,45 @@ public enum ActivityType: String, CaseIterable, Codable, Hashable, Sendable {
         return matchingValues.contains(candidate)
     }
 
+    public enum Category: String, CaseIterable {
+        case foot = "Foot Sports"
+        case cycle = "Cycling"
+        case water = "Water Sports"
+        case winter = "Winter Sports"
+        case other = "Other Sports"
+
+        public var icon: String {
+            switch self {
+            case .foot: return "figure.run"
+            case .cycle: return "figure.outdoor.cycle"
+            case .water: return "figure.pool.swim"
+            case .winter: return "snowflake"
+            case .other: return "sportscourt"
+            }
+        }
+    }
+
+    public var category: Category {
+        switch self {
+        case .run, .trailRun, .walk, .hike, .wheelchair, .virtualRun:
+            return .foot
+        case .ride, .mountainBikeRide, .gravelRide, .eBikeRide, .eMountainBikeRide, .velomobile, .handcycle, .virtualRide:
+            return .cycle
+        case .swim, .rowing, .kayaking, .canoeing, .standUpPaddling, .surfing, .kitesurf, .windsurf, .sail:
+            return .water
+        case .alpineSki, .backcountrySki, .nordicSki, .snowboard, .snowshoe, .iceSkate:
+            return .winter
+        case .inlineSkate, .rollerSki, .skateboard, .soccer, .tennis, .padel, .racquetball, .squash, .badminton, .pickleball, .tableTennis, .basketball, .volleyball, .cricket, .dance, .golf, .elliptical:
+            return .other
+        }
+    }
+
+    public static func grouped() -> [(category: Category, types: [ActivityType])] {
+        Category.allCases.map { category in
+            (category: category, types: allCases.filter { $0.category == category })
+        }
+    }
+
     public static func defaultsValue(for selection: [ActivityType]) -> [String] {
         let source = selection.isEmpty ? Array(defaultSelected) : selection
         return source.map(\.rawValue)
