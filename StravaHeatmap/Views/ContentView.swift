@@ -8,7 +8,7 @@ struct ContentView: View {
         Group {
             switch authState {
             case .loading:
-                ProgressView("Checking Strava account…")
+                ProgressView("Checking account…")
             case .signedOut:
                 LoginView {
                     Task { await refreshAuthState() }

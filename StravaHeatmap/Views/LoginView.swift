@@ -1,3 +1,4 @@
+import AuthenticationServices
 import SwiftUI
 import StravaHeatmapCore
 
@@ -99,6 +100,8 @@ struct LoginView: View {
 
             _ = try await StravaAPIClient.shared.exchangeAuthorizationCode(code)
             onAuthenticated()
+        } catch let error as ASWebAuthenticationSessionError where error.code == .canceledLogin {
+            // User dismissed the login sheet — not an error.
         } catch {
             await MainActor.run {
                 errorMessage = "Unable to complete Strava login. Check your STRAVA_CLIENT_ID / STRAVA_CLIENT_SECRET Info.plist keys and try again."
