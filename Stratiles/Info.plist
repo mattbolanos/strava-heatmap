@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.mattbolanos.stratiles</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>stratiles</string>
+			</array>
+		</dict>
+	</array>
+	<key>STRAVA_CLIENT_ID</key>
+	<string>201505</string>
+	<key>STRAVA_CLIENT_SECRET</key>
+	<string>e56f4ec34785c32be337700d0b0cb6ef271c37c9</string>
+</dict>
+</plist>
