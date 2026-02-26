@@ -67,6 +67,21 @@ public actor StravaAPIClient {
         perPage: Int = 100,
         after: Date
     ) async throws -> [HeatmapDay] {
+        let raw = try await fetchRawActivities(
+            selectedTypes: selectedTypes,
+            maxPages: maxPages,
+            perPage: perPage,
+            after: after
+        )
+        return aggregateByDay(raw)
+    }
+
+    public func fetchRawActivities(
+        selectedTypes: Set<ActivityType>,
+        maxPages: Int = 8,
+        perPage: Int = 100,
+        after: Date
+    ) async throws -> [StravaActivity] {
         var accessToken = try await getAccessToken()
         var seenActivityIDs = Set<Int>()
         var filteredActivities: [StravaActivity] = []
@@ -111,7 +126,7 @@ public actor StravaAPIClient {
             }
         }
 
-        return aggregateByDay(filteredActivities)
+        return filteredActivities
     }
 
     private func buildActivitiesURL(after: Date, page: Int, perPage: Int) -> URL {

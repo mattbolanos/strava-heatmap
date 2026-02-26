@@ -14,7 +14,7 @@ struct ContentView: View {
                     Task { await refreshAuthState() }
                 }
             case .signedIn:
-                SettingsView {
+                SignedInRootView {
                     Task { await refreshAuthState() }
                 }
             }

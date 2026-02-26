@@ -6,10 +6,12 @@ public actor ActivityCache {
     public struct CachedPayload: Codable, Sendable {
         public let fetchedAt: Date
         public let heatmapDays: [HeatmapDay]
+        public let activities: [StravaActivity]?
 
-        public init(fetchedAt: Date, heatmapDays: [HeatmapDay]) {
+        public init(fetchedAt: Date, heatmapDays: [HeatmapDay], activities: [StravaActivity]? = nil) {
             self.fetchedAt = fetchedAt
             self.heatmapDays = heatmapDays
+            self.activities = activities
         }
 
         public func isFresh(maxAge: TimeInterval) -> Bool {
@@ -30,13 +32,21 @@ public actor ActivityCache {
         return decoded.buckets[cacheKey(for: selectedTypes)]
     }
 
-    public func write(heatmapDays: [HeatmapDay], selectedTypes: Set<ActivityType>) {
+    public func write(
+        heatmapDays: [HeatmapDay],
+        selectedTypes: Set<ActivityType>,
+        activities: [StravaActivity]? = nil
+    ) {
         guard let url = cacheURL else { return }
 
         var store = (try? Data(contentsOf: url))
             .flatMap { try? JSONDecoder().decode(Store.self, from: $0) } ?? Store(buckets: [:])
 
-        store.buckets[cacheKey(for: selectedTypes)] = CachedPayload(fetchedAt: Date(), heatmapDays: heatmapDays)
+        store.buckets[cacheKey(for: selectedTypes)] = CachedPayload(
+            fetchedAt: Date(),
+            heatmapDays: heatmapDays,
+            activities: activities
+        )
 
         if let encoded = try? JSONEncoder().encode(store) {
             try? encoded.write(to: url, options: [.atomic])

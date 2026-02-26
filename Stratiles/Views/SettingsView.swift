@@ -4,6 +4,7 @@ import StratilesCore
 
 struct SettingsView: View {
     let onSignedOut: () -> Void
+    var onActivityTypesChanged: (Set<ActivityType>) -> Void = { _ in }
 
     @State private var selectedTypes = SharedActivityTypeSettings.loadSelectedTypes()
     @State private var isSigningOut = false
@@ -81,6 +82,7 @@ struct SettingsView: View {
             selectedTypes = nonEmpty
             SharedActivityTypeSettings.saveSelectedTypes(nonEmpty)
             WidgetCenter.shared.reloadAllTimelines()
+            onActivityTypesChanged(nonEmpty)
         }
     }
 
