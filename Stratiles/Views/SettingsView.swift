@@ -12,6 +12,30 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+              Section {
+                    WidgetInstructionRow(step: 1, icon: "plus.app", text: "Long-press your Home Screen")
+                    WidgetInstructionRow(step: 2, icon: "hand.tap", text: "Tap Add Widget")
+                    WidgetInstructionRow(step: 3, icon: "magnifyingglass", text: "Search for \"Stratiles\"")
+                    WidgetInstructionRow(step: 4, icon: "checkmark.circle", text: "Add the widget you want!")
+                } header: {
+                    if #available(iOS 26.0, *) {
+                        Label("Add to Home Screen", systemImage: "square.grid.2x2")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.stravaOrange)
+                            .textCase(nil)
+                            .labelStyle(.titleAndIcon)
+                            .labelIconToTitleSpacing(8)
+                    } else {
+                        Label("Add to Home Screen", systemImage: "square.grid.2x2")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.stravaOrange)
+                            .textCase(nil)
+                            .labelStyle(.titleOnly)
+                    }
+                } footer: {
+                    Text("Long-press the widget and choose \"Edit Widget\" to change activity types directly from there.")
+                }
+
                 ForEach(ActivityType.grouped(), id: \.category) { group in
                     Section {
                         ForEach(group.types, id: \.self) { type in
@@ -35,30 +59,6 @@ struct SettingsView: View {
                     }
                 }
                 .tint(Theme.stravaOrange)
-
-                Section {
-                    WidgetInstructionRow(step: 1, icon: "plus.app", text: "Long-press your Home Screen")
-                    WidgetInstructionRow(step: 2, icon: "hand.tap", text: "Tap Add Widget")
-                    WidgetInstructionRow(step: 3, icon: "magnifyingglass", text: "Search for \"Stratiles\"")
-                    WidgetInstructionRow(step: 4, icon: "checkmark.circle", text: "Add the widget you want!")
-                } header: {
-                    if #available(iOS 26.0, *) {
-                        Label("Add to Home Screen", systemImage: "square.grid.2x2")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Theme.stravaOrange)
-                            .textCase(nil)
-                            .labelStyle(.titleAndIcon)
-                            .labelIconToTitleSpacing(8)
-                    } else {
-                        Label("Add to Home Screen", systemImage: "square.grid.2x2")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Theme.stravaOrange)
-                            .textCase(nil)
-                            .labelStyle(.titleOnly)
-                    }
-                } footer: {
-                    Text("Long-press the widget and choose \"Edit Widget\" to change activity types directly from there.")
-                }
 
                 Section {
                     Button(role: .destructive) {

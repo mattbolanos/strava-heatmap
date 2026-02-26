@@ -12,6 +12,7 @@ public struct StravaActivity: Codable, Identifiable, Sendable {
     public let startDateLocal: Date
     public let totalElevationGain: Double
     public let kudosCount: Int
+    public let sufferScore: Int?
 
     public enum CodingKeys: String, CodingKey {
         case id
@@ -25,6 +26,7 @@ public struct StravaActivity: Codable, Identifiable, Sendable {
         case startDateLocal = "start_date_local"
         case totalElevationGain = "total_elevation_gain"
         case kudosCount = "kudos_count"
+        case sufferScore = "suffer_score"
     }
 
     public init(
@@ -38,7 +40,8 @@ public struct StravaActivity: Codable, Identifiable, Sendable {
         startDate: Date,
         startDateLocal: Date,
         totalElevationGain: Double,
-        kudosCount: Int
+        kudosCount: Int,
+        sufferScore: Int? = nil
     ) {
         self.id = id
         self.name = name
@@ -51,5 +54,6 @@ public struct StravaActivity: Codable, Identifiable, Sendable {
         self.startDateLocal = startDateLocal
         self.totalElevationGain = totalElevationGain
         self.kudosCount = kudosCount
+        self.sufferScore = sufferScore
     }
 }

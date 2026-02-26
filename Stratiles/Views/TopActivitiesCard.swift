@@ -72,9 +72,9 @@ struct TopActivitiesCard: View {
                 .frame(width: 26, alignment: .leading)
 
             Image(systemName: activity.activityType?.category.icon ?? "sportscourt")
-                .font(.caption)
+                .font(.body)
                 .foregroundStyle(Theme.stravaOrange)
-                .frame(width: 22)
+                .frame(width: 28)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(activity.name)

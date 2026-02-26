@@ -69,6 +69,9 @@ public enum ActivityInsightsBuilder {
         let heatmapView = HeatmapBuilder.buildHeatmapView(heatmap: heatmapDays, weeksToShow: weeksToShow)
         let activeDays = Set(daily.keys)
 
+        let pacePoints = makePacePoints(from: activities, startDay: startDay, endDay: endDay, calendar: calendar)
+        let (effortPoints, weeklyEffort) = makeEffortData(from: activities, startDay: startDay, endDay: endDay, calendar: calendar)
+
         return ActivityInsights(
             windowStart: startDay,
             windowEnd: endDay,
@@ -87,7 +90,10 @@ public enum ActivityInsightsBuilder {
             maxRhythmCount: rhythm.values.map(\.activityCount).max() ?? 0,
             typeBreakdown: makeTypeBreakdown(from: typeCounts, totalActivities: totalActivities),
             peakDays: makePeakDays(from: daily, limit: peakDayLimit),
-            peakActivities: makePeakActivities(from: activities, startDay: startDay, endDay: endDay, calendar: calendar, limit: peakActivityLimit)
+            peakActivities: makePeakActivities(from: activities, startDay: startDay, endDay: endDay, calendar: calendar, limit: peakActivityLimit),
+            pacePoints: pacePoints,
+            effortPoints: effortPoints,
+            weeklyEffort: weeklyEffort
         )
     }
 
@@ -357,6 +363,67 @@ public enum ActivityInsightsBuilder {
         return calendar
     }
 
+
+    private static func makePacePoints(
+        from activities: [StravaActivity],
+        startDay: Date,
+        endDay: Date,
+        calendar: Calendar
+    ) -> [PacePoint] {
+        activities
+            .filter {
+                let localDay = calendar.startOfDay(for: $0.startDateLocal)
+                return localDay >= startDay && localDay <= endDay
+                    && $0.distance > 500 && $0.movingTime > 0
+            }
+            .map { activity in
+                let miles = activity.distance / metersPerMile
+                let paceSecondsPerMile = Double(activity.movingTime) / miles
+                let matchedType = ActivityType.allCases.first {
+                    $0.matches(type: activity.type, sportType: activity.sportType)
+                }
+                return PacePoint(
+                    date: activity.startDateLocal,
+                    paceSecondsPerMile: paceSecondsPerMile,
+                    activityName: activity.name,
+                    miles: round(miles, places: 2),
+                    activityType: matchedType
+                )
+            }
+            .sorted { $0.date < $1.date }
+    }
+
+    private static func makeEffortData(
+        from activities: [StravaActivity],
+        startDay: Date,
+        endDay: Date,
+        calendar: Calendar
+    ) -> (effortPoints: [EffortPoint], weeklyEffort: [WeeklyEffort]) {
+        let filtered = activities.filter {
+            let localDay = calendar.startOfDay(for: $0.startDateLocal)
+            return localDay >= startDay && localDay <= endDay
+                && ($0.sufferScore ?? 0) > 0
+        }
+
+        let effortPoints = filtered
+            .map { EffortPoint(date: $0.startDateLocal, sufferScore: $0.sufferScore!, activityName: $0.name) }
+            .sorted { $0.date < $1.date }
+
+        var weeklyBuckets: [Date: (total: Int, count: Int)] = [:]
+        for activity in filtered {
+            let weekStart = startOfWeek(for: calendar.startOfDay(for: activity.startDateLocal), calendar: calendar)
+            var bucket = weeklyBuckets[weekStart] ?? (total: 0, count: 0)
+            bucket.total += activity.sufferScore!
+            bucket.count += 1
+            weeklyBuckets[weekStart] = bucket
+        }
+
+        let weeklyEffort = weeklyBuckets
+            .map { WeeklyEffort(weekStart: $0.key, totalSufferScore: $0.value.total, activityCount: $0.value.count) }
+            .sorted { $0.weekStart < $1.weekStart }
+
+        return (effortPoints, weeklyEffort)
+    }
 
     private static func round(_ value: Double, places: Int) -> Double {
         let factor = pow(10.0, Double(places))

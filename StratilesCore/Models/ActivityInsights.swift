@@ -98,6 +98,46 @@ public struct PeakActivity: Hashable, Sendable, Identifiable {
     }
 }
 
+public struct PacePoint: Hashable, Sendable {
+    public let date: Date
+    public let paceSecondsPerMile: Double
+    public let activityName: String
+    public let miles: Double
+    public let activityType: ActivityType?
+
+    public init(date: Date, paceSecondsPerMile: Double, activityName: String, miles: Double, activityType: ActivityType? = nil) {
+        self.date = date
+        self.paceSecondsPerMile = paceSecondsPerMile
+        self.activityName = activityName
+        self.miles = miles
+        self.activityType = activityType
+    }
+}
+
+public struct EffortPoint: Hashable, Sendable {
+    public let date: Date
+    public let sufferScore: Int
+    public let activityName: String
+
+    public init(date: Date, sufferScore: Int, activityName: String) {
+        self.date = date
+        self.sufferScore = sufferScore
+        self.activityName = activityName
+    }
+}
+
+public struct WeeklyEffort: Hashable, Sendable {
+    public let weekStart: Date
+    public let totalSufferScore: Int
+    public let activityCount: Int
+
+    public init(weekStart: Date, totalSufferScore: Int, activityCount: Int) {
+        self.weekStart = weekStart
+        self.totalSufferScore = totalSufferScore
+        self.activityCount = activityCount
+    }
+}
+
 public struct ActivityInsights: Sendable {
     public let windowStart: Date
     public let windowEnd: Date
@@ -121,6 +161,9 @@ public struct ActivityInsights: Sendable {
     public let typeBreakdown: [ActivityTypeBreakdown]
     public let peakDays: [PeakDay]
     public let peakActivities: [PeakActivity]
+    public let pacePoints: [PacePoint]
+    public let effortPoints: [EffortPoint]
+    public let weeklyEffort: [WeeklyEffort]
 
     public init(
         windowStart: Date,
@@ -140,7 +183,10 @@ public struct ActivityInsights: Sendable {
         maxRhythmCount: Int,
         typeBreakdown: [ActivityTypeBreakdown],
         peakDays: [PeakDay],
-        peakActivities: [PeakActivity]
+        peakActivities: [PeakActivity],
+        pacePoints: [PacePoint] = [],
+        effortPoints: [EffortPoint] = [],
+        weeklyEffort: [WeeklyEffort] = []
     ) {
         self.windowStart = windowStart
         self.windowEnd = windowEnd
@@ -160,5 +206,8 @@ public struct ActivityInsights: Sendable {
         self.typeBreakdown = typeBreakdown
         self.peakDays = peakDays
         self.peakActivities = peakActivities
+        self.pacePoints = pacePoints
+        self.effortPoints = effortPoints
+        self.weeklyEffort = weeklyEffort
     }
 }

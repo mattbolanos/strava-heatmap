@@ -24,7 +24,6 @@ struct TrainingRhythmHeatmap: View {
                     .foregroundStyle(.secondary)
             } else {
                 rhythmGrid
-                legend
             }
         }
         .padding(14)
@@ -66,26 +65,6 @@ struct TrainingRhythmHeatmap: View {
                     }
                 }
             }
-        }
-    }
-
-    private var legend: some View {
-        HStack(spacing: 8) {
-            Text("Low")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-
-            LinearGradient(
-                colors: [Theme.subtleOrange, Theme.stravaOrange.opacity(0.9)],
-                startPoint: .leading,
-                endPoint: .trailing
-            )
-            .frame(width: 90, height: 8)
-            .clipShape(.rect(cornerRadius: 4))
-
-            Text("High")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
         }
     }
 

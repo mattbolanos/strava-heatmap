@@ -2,26 +2,23 @@ import Charts
 import SwiftUI
 import StratilesCore
 
-struct StreakAndVolumeChart: View {
+struct WeeklyMilesChart: View {
     let insights: ActivityInsights
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Weekly Miles")
-                .font(.headline)
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Weekly Miles")
+                    .font(.headline)
 
-            if insights.currentStreakDays > 0 || insights.longestStreakDays > 0 {
-                HStack(spacing: 16) {
-                    if insights.currentStreakDays > 0 {
-                        Label("\(insights.currentStreakDays)d streak", systemImage: "flame")
-                            .foregroundStyle(Theme.stravaOrange)
-                    }
-                    if insights.longestStreakDays > 0 {
-                        Label("\(insights.longestStreakDays)d best", systemImage: "trophy")
-                            .foregroundStyle(.secondary)
-                    }
+                if !insights.weeklyVolumes.isEmpty {
+                    let active = insights.weeklyVolumes.filter { $0.miles >= 1 }.count
+                    let total = max(1, Calendar.current.dateComponents([.weekOfYear], from: insights.windowStart, to: insights.windowEnd).weekOfYear ?? 1)
+                    let percentage = Int(Double(active) / Double(total) * 100)
+                    Text("\(active)/\(total) (\(percentage)%) weeks w/ 1+ mi")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
-                .font(.subheadline.weight(.medium))
             }
 
             if insights.weeklyVolumes.isEmpty {
