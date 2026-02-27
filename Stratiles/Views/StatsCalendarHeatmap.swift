@@ -77,8 +77,8 @@ struct StatsCalendarHeatmap: View {
     }
 
     private func color(for cell: HeatmapCell) -> Color {
-        guard cell.date <= insights.windowEnd else {
-            return HeatmapColors.tileColor(level: 0, colorScheme: colorScheme)
+        guard cell.date <= insights.heatmapView.today else {
+            return .clear
         }
 
         let level = HeatmapBuilder.getLevel(miles: cell.miles, maxMiles: insights.heatmapView.maxMiles)
