@@ -5,9 +5,8 @@ struct StratilesWidget: Widget {
     let kind: String = "StratilesWidget"
 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(
+        StaticConfiguration(
             kind: kind,
-            intent: SelectActivityTypesIntent.self,
             provider: HeatmapTimelineProvider()
         ) { entry in
             HeatmapWidgetView(entry: entry)

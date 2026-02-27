@@ -32,8 +32,6 @@ struct SettingsView: View {
                             .textCase(nil)
                             .labelStyle(.titleOnly)
                     }
-                } footer: {
-                    Text("Long-press the widget and choose \"Edit Widget\" to change activity types directly from there.")
                 }
 
                 ForEach(ActivityType.grouped(), id: \.category) { group in

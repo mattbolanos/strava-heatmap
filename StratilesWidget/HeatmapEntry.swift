@@ -4,7 +4,6 @@ import StratilesCore
 
 struct HeatmapEntry: TimelineEntry {
     let date: Date
-    let configuration: SelectActivityTypesIntent
     let viewModel: HeatmapViewModel
     let selectedTypes: [ActivityType]
     let isPlaceholder: Bool
@@ -33,7 +32,6 @@ struct HeatmapEntry: TimelineEntry {
         let view = HeatmapBuilder.buildHeatmapView(heatmap: days, weeksToShow: 52)
         return HeatmapEntry(
             date: Date(),
-            configuration: SelectActivityTypesIntent(),
             viewModel: view,
             selectedTypes: [.run],
             isPlaceholder: true
