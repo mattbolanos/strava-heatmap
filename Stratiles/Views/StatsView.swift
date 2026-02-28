@@ -18,7 +18,9 @@ struct StatsView: View {
                             Task { await viewModel.refresh(selectedTypes: selectedTypes, force: true) }
                         } label: {
                             Image(systemName: "arrow.clockwise")
+                                .symbolEffect(.rotate, isActive: viewModel.isRefreshing)
                         }
+                        .disabled(viewModel.isRefreshing)
                     }
                 }
         }
@@ -51,9 +53,7 @@ struct StatsView: View {
         case let .loaded(insights):
             ScrollView {
                 VStack(spacing: 14) {
-                    if let staleNotice = viewModel.staleNotice {
-                        staleBanner(staleNotice)
-                    }
+                    refreshIndicator
 
                     StatsKPIHeader(insights: insights)
                     StatsCalendarHeatmap(insights: insights)
@@ -71,6 +71,9 @@ struct StatsView: View {
                         .padding(.top, 8)
                 }
                 .padding(14)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .animation(.smooth, value: viewModel.refreshNotice)
             }
             .refreshable {
                 await viewModel.refresh(selectedTypes: selectedTypes, force: true)
@@ -78,17 +81,28 @@ struct StatsView: View {
         }
     }
 
-    private func staleBanner(_ text: String) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: "icloud.slash")
-                .foregroundStyle(.yellow)
-            Text(text)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Spacer(minLength: 0)
+    @ViewBuilder
+    private var refreshIndicator: some View {
+        if let notice = viewModel.refreshNotice {
+            HStack(spacing: 6) {
+                switch notice {
+                case .updating:
+                    ProgressView()
+                        .controlSize(.mini)
+                    Text("Updating")
+                case .offline:
+                    Image(systemName: "icloud.slash")
+                        .imageScale(.small)
+                    Text("Cached")
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(.ultraThinMaterial, in: Capsule())
+            .transition(.blurReplace)
         }
-        .padding(12)
-        .background(.thinMaterial, in: .rect(cornerRadius: 12, style: .continuous))
     }
 }
 
