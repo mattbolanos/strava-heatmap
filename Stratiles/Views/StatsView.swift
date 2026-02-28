@@ -70,6 +70,7 @@ struct StatsView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 8)
                 }
+                .padding(14)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 12)
                 .animation(.smooth, value: viewModel.refreshNotice)
