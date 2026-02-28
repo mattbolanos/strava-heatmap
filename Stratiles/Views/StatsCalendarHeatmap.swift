@@ -11,7 +11,7 @@ struct StatsCalendarHeatmap: View {
     private let labelColumnWidth: CGFloat = 22
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Miles Per Day")
                 .font(.headline)
 

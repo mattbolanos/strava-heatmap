@@ -70,8 +70,7 @@ struct StatsView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 8)
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 12)
+                .padding(14)
             }
             .refreshable {
                 await viewModel.refresh(selectedTypes: selectedTypes, force: true)
