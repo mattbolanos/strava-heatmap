@@ -15,15 +15,18 @@ struct StatsView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
-                            Task { await viewModel.refresh(selectedTypes: selectedTypes, force: true) }
+                            Task {
+                                await viewModel.refresh(selectedTypes: selectedTypes, force: true)
+                            }
                         } label: {
                             Image(systemName: "arrow.clockwise")
-                                .symbolEffect(.rotate, isActive: viewModel.isRefreshing)
                         }
+                        .sensoryFeedback(.impact(weight: .light), trigger: viewModel.isRefreshing)
                         .disabled(viewModel.isRefreshing)
                     }
                 }
         }
+        .sensoryFeedback(.success, trigger: viewModel.refreshSuccessToken)
         .task(id: reloadToken) {
             await viewModel.refresh(selectedTypes: selectedTypes)
         }
@@ -44,36 +47,45 @@ struct StatsView: View {
             )
 
         case let .failed(message):
-            ContentUnavailableView(
-                "Stats unavailable",
-                systemImage: "exclamationmark.triangle",
-                description: Text(message)
-            )
+            ContentUnavailableView {
+                Label("Stats unavailable", systemImage: "exclamationmark.triangle")
+            } description: {
+                Text(message)
+            } actions: {
+                Button("Try Again") {
+                    Task { await viewModel.refresh(selectedTypes: selectedTypes, force: true) }
+                }
+                .buttonStyle(.borderedProminent)
+            }
 
         case let .loaded(insights):
             ScrollView {
-                VStack(spacing: 14) {
-                    refreshIndicator
-
+                VStack(spacing: 0) {
                     StatsKPIHeader(insights: insights)
-                    StatsCalendarHeatmap(insights: insights)
-                    TrainingRhythmHeatmap(insights: insights)
-                    WeeklyMilesChart(insights: insights)
-                    PaceTrendChart(insights: insights)
-                    EffortTimelineChart(insights: insights)
-                    TopActivitiesCard(insights: insights)
 
-                    Text("Stats based on your activities from past 365 days.")
-                        .font(.footnote)
-                        .foregroundStyle(.tertiary)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 8)
+                    VStack(spacing: 14) {
+                        sectionLabel("FREQUENCY")
+                        StatsCalendarHeatmap(insights: insights)
+                        TrainingRhythmHeatmap(insights: insights)
+                    }
+                    .padding(.top, 20)
+
+                    VStack(spacing: 14) {
+                        sectionLabel("TRENDS")
+                        WeeklyMilesChart(insights: insights)
+                        PaceTrendChart(insights: insights)
+                        EffortTimelineChart(insights: insights)
+                    }
+                    .padding(.top, 20)
+
+                    VStack(spacing: 14) {
+                        sectionLabel("HIGHLIGHTS")
+                        TopActivitiesCard(insights: insights)
+                    }
+                    .padding(.top, 20)
                 }
-                .padding(14)
-                .padding(.horizontal, 14)
+                .padding(.horizontal, 16)
                 .padding(.vertical, 12)
-                .animation(.smooth, value: viewModel.refreshNotice)
             }
             .refreshable {
                 await viewModel.refresh(selectedTypes: selectedTypes, force: true)
@@ -81,28 +93,13 @@ struct StatsView: View {
         }
     }
 
-    @ViewBuilder
-    private var refreshIndicator: some View {
-        if let notice = viewModel.refreshNotice {
-            HStack(spacing: 6) {
-                switch notice {
-                case .updating:
-                    ProgressView()
-                        .controlSize(.mini)
-                    Text("Updating")
-                case .offline:
-                    Image(systemName: "icloud.slash")
-                        .imageScale(.small)
-                    Text("Cached")
-                }
-            }
-            .font(.caption)
+    private func sectionLabel(_ title: String) -> some View {
+        Text(title)
+            .font(.caption.weight(.semibold))
             .foregroundStyle(.secondary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(.ultraThinMaterial, in: Capsule())
-            .transition(.blurReplace)
-        }
+            .textCase(.uppercase)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 2)
     }
 }
 

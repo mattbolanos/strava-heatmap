@@ -23,6 +23,7 @@ final class StatsViewModel {
 
     var loadState: LoadState = .idle
     var refreshNotice: RefreshNotice?
+    private(set) var refreshSuccessToken: UUID?
 
     var isRefreshing: Bool { refreshNotice == .updating }
 
@@ -84,6 +85,7 @@ final class StatsViewModel {
                 activities: activities
             )
 
+            refreshSuccessToken = UUID()
             refreshNotice = nil
             loadState = insights.totalActivities == 0 ? .empty : .loaded(insights)
         } catch {
