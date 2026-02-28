@@ -72,6 +72,22 @@ struct SettingsView: View {
                     }
                     .disabled(isSigningOut)
                 }
+
+                Section {
+                    Link(destination: URL(string: "https://github.com/mattbolanos/stratiles")!) {
+                        HStack {
+                            Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                            Spacer()
+                            Image(systemName: "arrow.up.right.square")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } footer: {
+                    Text("Made with ❤️ by Matt Bolanos")
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 4)
+                }
             }
             .navigationTitle("Stratiles")
         }
