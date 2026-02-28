@@ -16,8 +16,15 @@ final class StatsViewModel {
     private let cacheFreshness: TimeInterval = 3_600
     private let windowDays = 366
 
+    enum RefreshNotice: Equatable {
+        case updating
+        case offline
+    }
+
     var loadState: LoadState = .idle
-    var staleNotice: String?
+    var refreshNotice: RefreshNotice?
+
+    var isRefreshing: Bool { refreshNotice == .updating }
 
     func refresh(selectedTypes: Set<ActivityType>, force: Bool = false) async {
         let normalizedTypes = selectedTypes.isEmpty ? ActivityType.defaultSelected : selectedTypes
@@ -37,11 +44,11 @@ final class StatsViewModel {
                 showingCachedData = true
 
                 if cached.isFresh(maxAge: cacheFreshness), !force {
-                    staleNotice = nil
+                    refreshNotice = nil
                     return
                 }
 
-                staleNotice = "Showing cached stats while refreshing."
+                refreshNotice = .updating
             } else if !cached.heatmapDays.isEmpty {
                 let partialInsights = ActivityInsightsBuilder.buildPartial(
                     heatmapDays: cached.heatmapDays,
@@ -49,14 +56,14 @@ final class StatsViewModel {
                     windowDays: windowDays
                 )
                 loadState = partialInsights.totalActivities == 0 ? .empty : .loaded(partialInsights)
-                staleNotice = "Showing limited cached stats while refreshing."
+                refreshNotice = .updating
                 showingCachedData = true
             }
         }
 
         if !showingCachedData {
             loadState = .loading
-            staleNotice = nil
+            refreshNotice = nil
         }
 
         do {
@@ -77,11 +84,11 @@ final class StatsViewModel {
                 activities: activities
             )
 
-            staleNotice = nil
+            refreshNotice = nil
             loadState = insights.totalActivities == 0 ? .empty : .loaded(insights)
         } catch {
             if showingCachedData {
-                staleNotice = "Unable to refresh right now. Showing cached stats."
+                refreshNotice = .offline
                 return
             }
 
