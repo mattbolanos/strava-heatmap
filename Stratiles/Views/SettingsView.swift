@@ -84,7 +84,7 @@ struct SettingsView: View {
                         }
                     }
                 } footer: {
-                    Text("Made with ❤️ in NYC")
+                    Text("Made with ❤️ by Matt Bolanos")
                         .frame(maxWidth: .infinity)
                         .padding(.top, 4)
                 }
