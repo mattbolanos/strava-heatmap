@@ -83,10 +83,13 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                } footer: {
-                    Text("Made with ❤️ by Matt Bolanos")
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 4)
+                } header: {
+                    VStack(spacing: 4) {
+                        Text("Made with ❤️ by Matt Bolaños")
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
             }
             .navigationTitle("Stratiles")
