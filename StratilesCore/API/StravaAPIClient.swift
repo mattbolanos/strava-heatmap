@@ -12,14 +12,11 @@ public actor StravaAPIClient {
     }
 
     public func exchangeAuthorizationCode(_ code: String) async throws -> StravaToken {
-        let config = try StravaConfiguration.current()
-        var request = URLRequest(url: URL(string: "https://www.strava.com/oauth/token")!)
+        var request = URLRequest(url: URL(string: "\(SharedConstants.authWorkerBaseURL)/auth/token")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let payload: [String: Any] = [
-            "client_id": config.clientID,
-            "client_secret": config.clientSecret,
             "code": code,
             "grant_type": "authorization_code",
         ]
@@ -140,14 +137,11 @@ public actor StravaAPIClient {
     }
 
     private func refreshAccessToken(using refreshToken: String) async throws -> StravaToken {
-        let config = try StravaConfiguration.current()
-        var request = URLRequest(url: URL(string: "https://www.strava.com/oauth/token")!)
+        var request = URLRequest(url: URL(string: "\(SharedConstants.authWorkerBaseURL)/auth/token")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let payload: [String: Any] = [
-            "client_id": config.clientID,
-            "client_secret": config.clientSecret,
             "grant_type": "refresh_token",
             "refresh_token": refreshToken,
         ]
@@ -270,20 +264,17 @@ public enum StravaAPIClientError: Error {
 
 public struct StravaConfiguration: Sendable {
     public let clientID: String
-    public let clientSecret: String
 
     public static let callbackURLScheme = "stratiles"
     public static let callbackURL = "stratiles://localhost/callback"
 
     public static func current(bundle: Bundle = .main) throws -> StravaConfiguration {
         guard let clientID = bundle.object(forInfoDictionaryKey: "STRAVA_CLIENT_ID") as? String,
-              let clientSecret = bundle.object(forInfoDictionaryKey: "STRAVA_CLIENT_SECRET") as? String,
-              !clientID.isEmpty,
-              !clientSecret.isEmpty else {
+              !clientID.isEmpty else {
             throw StravaAPIClientError.missingConfiguration
         }
 
-        return StravaConfiguration(clientID: clientID, clientSecret: clientSecret)
+        return StravaConfiguration(clientID: clientID)
     }
 }
 

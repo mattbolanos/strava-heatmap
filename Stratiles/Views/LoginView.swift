@@ -104,7 +104,7 @@ struct LoginView: View {
             // User dismissed the login sheet — not an error.
         } catch {
             await MainActor.run {
-                errorMessage = "Unable to complete Strava login. Check your STRAVA_CLIENT_ID / STRAVA_CLIENT_SECRET Info.plist keys and try again."
+                errorMessage = "Unable to connect to Strava. Please check your internet connection and try again."
             }
         }
 

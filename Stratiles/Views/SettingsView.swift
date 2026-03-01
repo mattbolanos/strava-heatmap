@@ -83,6 +83,24 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                    Link(destination: URL(string: "https://mattbolanos.github.io/Stratiles/privacy-policy")!) {
+                        HStack {
+                            Label("Privacy Policy", systemImage: "hand.raised")
+                            Spacer()
+                            Image(systemName: "arrow.up.right.square")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    Link(destination: URL(string: "https://github.com/mattbolanos/stratiles/issues")!) {
+                        HStack {
+                            Label("Support", systemImage: "questionmark.circle")
+                            Spacer()
+                            Image(systemName: "arrow.up.right.square")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 } header: {
                     VStack(spacing: 4) {
                         Text("Made with ❤️ by Matt Bolaños")

@@ -5,6 +5,7 @@ public enum SharedConstants {
     public static let keychainAccessGroup = "$(AppIdentifierPrefix)com.mattbolanos.stratiles"
     public static let selectedActivityTypesDefaultsKey = "selectedActivityTypes"
     public static let cacheFileName = "activity-cache.json"
+    public static let authWorkerBaseURL = "https://stratiles-auth.stratiles.workers.dev"
 
     public static var sharedDefaults: UserDefaults? {
         UserDefaults(suiteName: appGroupIdentifier)
