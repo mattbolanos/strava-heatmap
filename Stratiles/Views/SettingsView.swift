@@ -8,6 +8,7 @@ struct SettingsView: View {
 
     @State private var selectedTypes = SharedActivityTypeSettings.loadSelectedTypes()
     @State private var isSigningOut = false
+    @State private var showingPrivacyPolicy = false
 
     var body: some View {
         NavigationStack {
@@ -83,11 +84,13 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    Link(destination: URL(string: "https://mattbolanos.github.io/Stratiles/privacy-policy")!) {
+                    Button {
+                        showingPrivacyPolicy = true
+                    } label: {
                         HStack {
                             Label("Privacy Policy", systemImage: "hand.raised")
                             Spacer()
-                            Image(systemName: "arrow.up.right.square")
+                            Image(systemName: "chevron.right")
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
                         }
@@ -111,6 +114,9 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Stratiles")
+            .sheet(isPresented: $showingPrivacyPolicy) {
+                PrivacyPolicyView()
+            }
         }
         .onChange(of: selectedTypes) { _, newValue in
             let nonEmpty = newValue.isEmpty ? ActivityType.defaultSelected : newValue
