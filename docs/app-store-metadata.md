@@ -62,7 +62,3 @@ Technical notes:
 ## Privacy Nutrition Label
 
 **Data Not Collected** — Stratiles does not collect any data. All activity data retrieved from Strava is stored locally on the user's device and is never transmitted to any server.
-
-## Privacy Policy URL
-
-https://mattbolanos.github.io/Stratiles/privacy-policy
